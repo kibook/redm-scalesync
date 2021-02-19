@@ -13,7 +13,7 @@ AddEventHandler('scalesync:setScale', function(player, scale)
 end)
 
 function SetScale(player, scale)
-	SetPedScale(GetPlayerPed(GetPlayerFromServerId(player)), scale)
+	SetPedScale(GetPlayerPed(GetPlayerFromServerId(player)), scale + 0.0)
 end
 
 AddEventHandler('scalesync:resetScale', function(player)
@@ -21,19 +21,14 @@ AddEventHandler('scalesync:resetScale', function(player)
 	SetScale(player, 1.0)
 end)
 
-AddEventHandler('onResourceStop', function(resourceName)
-	if GetCurrentResourceName() == resourceName then
-		SetPedScale(PlayerPedId(), 1.0)
-	end
-end)
-
 CreateThread(function()
 	TriggerServerEvent('scalesync:init')
 
 	while true do
-		Wait(100)
 		for player, scale in pairs(PlayerScales) do
 			SetScale(player, scale)
 		end
+
+		Wait(500)
 	end
 end)

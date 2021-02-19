@@ -3,29 +3,28 @@ local PlayerScales = {}
 RegisterNetEvent('scalesync:init')
 
 function SetScale(player, scale)
-	if scale < Config.MinScale then
-		scale = Config.MinScale
-	end
-	if scale > Config.MaxScale then
-		scale = Config.MaxScale
-	end
+	if scale then
+		if scale < Config.MinScale then
+			scale = Config.MinScale
+		elseif scale > Config.MaxScale then
+			scale = Config.MaxScale
+		end
 
-	if scale == 1.0 then
+		if PlayerScales[player] ~= scale then
+			PlayerScales[player] = scale
+			TriggerClientEvent('scalesync:setScale', -1, player, scale)
+		end
+	else
 		if PlayerScales[player] then
 			PlayerScales[player] = nil
 			TriggerClientEvent('scalesync:resetScale', -1, player)
 		end
-	elseif PlayerScales[player] ~= scale then
-		PlayerScales[player] = scale
-		TriggerClientEvent('scalesync:setScale', -1, player, scale)
 	end
 end
 
 RegisterCommand('scale', function(source, args, raw)
-	local scale = (args[1] and tonumber(args[1]) * 1.0 or 1.0)
-
-	SetScale(source, scale)
-end, false)
+	SetScale(source, tonumber(args[1]))
+end, true)
 
 function GetPlayerId(id)
 	local players = GetPlayers()
@@ -49,7 +48,7 @@ end
 
 RegisterCommand('setscale', function(source, args, raw)
 	local player = args[1]
-	local scale = tonumber(args[2]) * 1.0
+	local scale = tonumber(args[2])
 	local id = GetPlayerId(player)
 
 	SetScale(id, scale)
@@ -57,9 +56,7 @@ end, true)
 
 RegisterCommand('scales', function(source, args, raw)
 	for player, scale in pairs(PlayerScales) do
-		TriggerClientEvent('chat:addMessage', source, {
-			args = {player, scale}
-		})
+		print(player, scale)
 	end
 end, true)
 
